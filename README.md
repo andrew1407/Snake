@@ -28,7 +28,7 @@ javac -d out --module-path <javafx>/lib --add-modules javafx.controls,javafx.fxm
 java --module-path "<javafx>/lib:out" --add-modules javafx.controls,javafx.fxml -m Snake/sample.Main
 ```
 
-Or open the project in IntelliJ IDEA (an `.idea` module is included) and run `sample.Main`.
+Or open the project in IntelliJ IDEA (an [`.idea`](.idea) module is included) and run [`sample.Main`](src/sample/Main.java).
 
 ## Project structure
 
@@ -43,6 +43,8 @@ src/
     FrameView.java     # JavaFX window/scene rendering
     sample.fxml        # FXML layout
 ```
+
+The [`src`](src) tree holds [`module-info.java`](src/module-info.java) (the `Snake` module declaration) and the [`sample`](src/sample) package: [`Main.java`](src/sample/Main.java) (entry point + game loop), [`Controller.java`](src/sample/Controller.java) (keyboard input), [`SnakeBody.java`](src/sample/SnakeBody.java) (snake state), [`Pill.java`](src/sample/Pill.java) (pill spawning/scoring), [`FrameView.java`](src/sample/FrameView.java) (rendering), and [`sample.fxml`](src/sample/sample.fxml) (the FXML layout).
 
 ## License
 
