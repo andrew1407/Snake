@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" data-badge="1">
+  <!-- A snake on a 4 x 4 grid heading for a pill, in the showcase's colours, on a round outlined badge -->
+  <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#3557d6" stroke-width="4"/>
+  <svg x="12" y="12" width="40" height="40" viewBox="2.7 2.7 58.6 58.6">
+    <rect x="4" y="4" width="56" height="56" rx="12" fill="#d8ecfb" stroke="#4a90c8" stroke-width="2.6"/>
+    <path d="M18 5.5v53M32 5.5v53M46 5.5v53M5.5 18h53M5.5 32h53M5.5 46h53" stroke="#4a90c8" stroke-width="1.2" stroke-opacity=".45"/>
+    <path d="M53 53H25V39H11V11H32" fill="none" stroke="#3557d6" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="34" cy="11" r="5.4" fill="#3557d6"/>
+    <circle cx="35.6" cy="9.2" r="1.5" fill="#ffffff"/>
+    <g transform="rotate(-45 48.5 14.5)" stroke-width="2.6">
+      <rect x="41.5" y="10.5" width="14" height="8" rx="4" fill="#fbf1cc" stroke="#b8971b"/>
+      <path d="M48.5 10.5v8" stroke="#8a6d0b"/>
+    </g>
+  </svg>
+</svg>
