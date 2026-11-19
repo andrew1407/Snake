@@ -5,93 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Snake</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <script src="theme.js"></script>
   <meta name="description" content="The Snake game in your browser.">
   <style>
-    :root {
-      --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6673; --line: #dfe3e8; --grid: #eceff3;
-      --accent: #2b8a3e; --accent-ink: #ffffff; --soft: #e6f4ea; --err: #c0362c; --err-soft: #fdecea; --ok: #1f8a4c; --ok-soft: #e3f4ea;
-      --c2: #d4731f;
-      --java: #d4731f; --java-soft: #fbe9d9;
-      --board-edge: #c9ced6;
-      --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-      color-scheme: light;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        --bg: #111418; --panel: #191d23; --ink: #e6e9ee; --muted: #9aa4b2; --line: #2b313a; --grid: #222830;
-        --accent: #5cd07a; --accent-ink: #0d1117; --soft: #17301e; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
-        --c2: #f0a050;
-        --java: #f0a050; --java-soft: #3a2614;
-        --board-edge: #3a414c;
-        color-scheme: dark;
-      }
-    }
-    :root[data-theme="dark"] {
-      --bg: #111418; --panel: #191d23; --ink: #e6e9ee; --muted: #9aa4b2; --line: #2b313a; --grid: #222830;
-      --accent: #5cd07a; --accent-ink: #0d1117; --soft: #17301e; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
-      --c2: #f0a050;
-      --java: #f0a050; --java-soft: #3a2614;
-      --board-edge: #3a414c;
-      color-scheme: dark;
-    }
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    html, body { height: 100%; margin: 0; background: #000; color: #fff; overflow: hidden; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
     button { font: inherit; cursor: pointer; }
     [hidden] { display: none !important; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    .stage { min-height: 100%; display: grid; place-content: center; padding: 16px; }
-    .game { width: min(750px, calc(100vw - 32px), calc((100svh - 40px) * 1.5)); min-width: 0; }
-    .board { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--board-edge); background: #000; aspect-ratio: 3 / 2; touch-action: none; user-select: none; -webkit-user-select: none; }
-    .board canvas { display: block; width: 100%; height: 100%; }
-    .board:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .overlay { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; text-align: center; padding: 16px; background: rgb(0 0 0 / .55); color: #fff; }
-    .overlay.low { inset: auto 0 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .65)); padding: 28px 16px 16px; }
-    .overlay b { font-size: 20px; }
+    /* the whole window is the game, like the desktop window; the 30 x 20 board is scaled to fit */
+    .board { position: fixed; inset: 0; background: #000; touch-action: none; user-select: none; -webkit-user-select: none; outline: none; }
+    .board canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
+    .overlay { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; text-align: center; padding: 16px; background: rgb(0 0 0 / .55); }
+    .overlay.low { inset: auto 0 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .65)); padding: 28px 16px 24px; }
+    .overlay b { font-size: 22px; }
     .overlay small { color: #d4d8de; max-width: 420px; }
-    .run { padding: 8px 20px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+    .run { padding: 9px 22px; border: 0; border-radius: 10px; background: #2b8a3e; color: #fff; font-weight: 600; }
     .run:disabled { opacity: .5; cursor: wait; }
-    .run:focus-visible, .pad button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .theme-toggle.corner { position: fixed; top: 12px; right: 12px; z-index: 5; }
-    .err { background: var(--err-soft); border: 1px solid var(--err); border-radius: 10px; padding: 10px 14px; margin-top: 14px; color: var(--err); font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
-    .pad { display: none; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 56px); gap: 6px; justify-content: center; margin-top: 14px; touch-action: manipulation; }
-    .pad button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 12px; display: grid; place-items: center; }
-    .pad button:active { background: var(--soft); border-color: var(--accent); }
-    .pad [data-key="UP"] { grid-area: 1 / 2; } .pad [data-key="LEFT"] { grid-area: 2 / 1; }
-    .pad [data-key="RIGHT"] { grid-area: 2 / 3; } .pad [data-key="DOWN"] { grid-area: 3 / 2; }
-    @media (pointer: coarse), (max-width: 720px) {
-      .pad { display: grid; }
-      .game { width: min(750px, calc(100vw - 32px)); }
-      .overlay b { font-size: 17px; }
-      .overlay small { font-size: 12px; }
-      .overlay.low small { display: none; }
-      .overlay.low { padding: 12px; }
-    }
+    .run:focus-visible { outline: 2px solid #5cd07a; outline-offset: 2px; }
+    .err { position: fixed; left: 16px; right: 16px; bottom: 16px; background: #3a1d1c; border: 1px solid #ff7b72; border-radius: 10px; padding: 10px 14px; color: #ff7b72; font-family: ui-monospace, monospace; font-size: 14px; overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
-<button class="theme-toggle corner" data-theme-toggle></button>
 <span class="sr" id="status" role="status" aria-live="polite"></span>
-<main class="stage">
-  <div class="game">
-          <div class="board" id="board" tabindex="0" aria-label="Game board. Use the arrow keys or WASD to steer, or swipe.">
-            <canvas id="game" width="750" height="500"></canvas>
-            <div class="overlay" id="overlay">
-              <b id="ov-title">Ready</b>
-              <small id="ov-text">Press an arrow key or WASD, or tap Start. On a phone, swipe on the board or use the pad below.</small>
-              <button type="button" class="run" id="ov-btn">Start</button>
-            </div>
-          </div>
-          <div class="pad" id="pad" aria-label="Direction pad">
-            <button type="button" data-key="UP" aria-label="Up"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></button>
-            <button type="button" data-key="LEFT" aria-label="Left"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-            <button type="button" data-key="RIGHT" aria-label="Right"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
-            <button type="button" data-key="DOWN" aria-label="Down"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
-          </div>
-          <div class="err" id="err" hidden></div>
+<div class="board" id="board" tabindex="0" aria-label="Game board. Use the arrow keys or WASD to steer, or swipe.">
+  <canvas id="game" width="750" height="500"></canvas>
+  <div class="overlay" id="overlay">
+    <b id="ov-title">Ready</b>
+    <small id="ov-text">Press an arrow key or WASD, or tap Start. On a phone, swipe to steer.</small>
+    <button type="button" class="run" id="ov-btn">Start</button>
   </div>
-</main>
+</div>
+<div class="err" id="err" hidden></div>
 
 <script type="module" src="./app.js"></script>
 </body>

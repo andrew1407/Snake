@@ -10,7 +10,7 @@ const statusEl = $('#status'), errEl = $('#err');
 let state = 'ready';
 
 const VIEWS = {
-  ready: { title: 'Ready', text: 'Press an arrow key or WASD, or tap Start. On a phone, swipe on the board or use the pad below.', btn: 'Start' },
+  ready: { title: 'Ready', text: 'Press an arrow key or WASD, or tap Start. On a phone, swipe to steer.', btn: 'Start' },
   loading: { title: 'Loading…', text: 'Starting the compiled Java game.', btn: 'Start', busy: true },
   paused: { title: 'Paused', text: 'Press Space or Enter, or tap Resume.', btn: 'Resume' },
   hidden: { title: 'Paused', text: 'The game paused while this tab was hidden. Press Space or Enter, or tap Resume.', btn: 'Resume' },
@@ -112,7 +112,7 @@ document.addEventListener('keydown', (e) => {
   if (state === 'play') fx.press(code); // any other key reaches the game too (Esc quits)
 });
 
-// Swipes on the board: every 24 px of travel along the main axis is one turn.
+// Swipes anywhere on the screen: every 24 px of travel along the main axis is one turn.
 let touch = null;
 board.addEventListener('pointerdown', (e) => {
   if (e.pointerType === 'mouse' || e.target.closest('button')) return;
@@ -128,12 +128,6 @@ board.addEventListener('pointermove', (e) => {
 const endTouch = (e) => { if (touch && e.pointerId === touch.id) touch = null; };
 board.addEventListener('pointerup', endTouch);
 board.addEventListener('pointercancel', endTouch);
-
-// On-screen pad: react on press for touch, and on click for keyboard activation.
-document.querySelectorAll('#pad button').forEach((b) => {
-  b.addEventListener('pointerdown', (e) => { e.preventDefault(); steer(b.dataset.key); });
-  b.addEventListener('click', (e) => { if (e.detail === 0) steer(b.dataset.key); });
-});
 
 ovBtn.addEventListener('click', () => primary());
 
