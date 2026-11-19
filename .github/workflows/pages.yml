@@ -1,0 +1,52 @@
+name: Deploy showcase to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # Compile the game's Java sources (src/sample) with the JavaFX shim to JavaScript (TeaVM)
+      - name: Build TeaVM module
+        working-directory: web/teavm
+        run: ./gradlew showcase --no-daemon
+
+      # The page lives in web/, as in the repo; the root redirects to it
+      - name: Assemble site
+        run: |
+          mkdir -p _site/web
+          cp web/*.html web/*.js web/*.svg _site/web/
+          cp -r web/snake-js _site/web/
+          echo '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=./web/"><title>Snake</title><link rel="icon" href="./web/icon.svg"><a href="./web/">Open the game</a>' > _site/index.html
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

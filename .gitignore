@@ -25,3 +25,10 @@ hs_err_pid*
 #reports
 ReportSnakeRGR.doc
 ReportSnakeRGR.pdf
+
+# GitHub Pages showcase build outputs
+!web/teavm/gradle/wrapper/gradle-wrapper.jar
+web/teavm/build/
+web/teavm/.gradle/
+web/snake-js/
+_site/
