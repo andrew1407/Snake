@@ -42,7 +42,7 @@
     [hidden] { display: none !important; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .stage { min-height: 100%; display: grid; place-content: center; padding: 16px; }
-    .game { width: min(750px, calc(100vw - 32px), calc((100svh - 100px) * 1.5)); min-width: 0; }
+    .game { width: min(750px, calc(100vw - 32px), calc((100svh - 40px) * 1.5)); min-width: 0; }
     .board { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--board-edge); background: #000; aspect-ratio: 3 / 2; touch-action: none; user-select: none; -webkit-user-select: none; }
     .board canvas { display: block; width: 100%; height: 100%; }
     .board:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -52,14 +52,8 @@
     .overlay small { color: #d4d8de; max-width: 420px; }
     .run { padding: 8px 20px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
     .run:disabled { opacity: .5; cursor: wait; }
-    .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
-    .bar .theme-toggle { margin-left: 0; }
-    .btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 10px; padding: 7px 14px; font-size: 14px; }
-    .btn:hover { border-color: var(--accent); }
-    .btn:disabled { opacity: .5; cursor: default; border-color: var(--line); }
-    .btn:focus-visible, .run:focus-visible, .pad button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .best { margin-left: auto; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
-    .best b { color: var(--ink); }
+    .run:focus-visible, .pad button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .theme-toggle.corner { position: fixed; top: 12px; right: 12px; z-index: 5; }
     .err { background: var(--err-soft); border: 1px solid var(--err); border-radius: 10px; padding: 10px 14px; margin-top: 14px; color: var(--err); font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
     .pad { display: none; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 56px); gap: 6px; justify-content: center; margin-top: 14px; touch-action: manipulation; }
     .pad button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 12px; display: grid; place-items: center; }
@@ -68,8 +62,6 @@
     .pad [data-key="RIGHT"] { grid-area: 2 / 3; } .pad [data-key="DOWN"] { grid-area: 3 / 2; }
     @media (pointer: coarse), (max-width: 720px) {
       .pad { display: grid; }
-      .bar { gap: 6px; }
-      .btn { padding: 7px 10px; }
       .game { width: min(750px, calc(100vw - 32px)); }
       .overlay b { font-size: 17px; }
       .overlay small { font-size: 12px; }
@@ -79,6 +71,8 @@
   </style>
 </head>
 <body>
+<button class="theme-toggle corner" data-theme-toggle></button>
+<span class="sr" id="status" role="status" aria-live="polite"></span>
 <main class="stage">
   <div class="game">
           <div class="board" id="board" tabindex="0" aria-label="Game board. Use the arrow keys or WASD to steer, or swipe.">
@@ -88,14 +82,6 @@
               <small id="ov-text">Press an arrow key or WASD, or tap Start. On a phone, swipe on the board or use the pad below.</small>
               <button type="button" class="run" id="ov-btn">Start</button>
             </div>
-          </div>
-          <div class="bar">
-            <button type="button" class="btn" id="pause" disabled>Pause</button>
-            <button type="button" class="btn" id="restart">Restart</button>
-            <button type="button" class="btn" id="copy" title="Copy the board as a PNG image">Copy image</button>
-            <span class="best">Best <b id="s-best">0</b></span>
-            <button class="theme-toggle" data-theme-toggle></button>
-            <span class="sr" id="status" role="status" aria-live="polite"></span>
           </div>
           <div class="pad" id="pad" aria-label="Direction pad">
             <button type="button" data-key="UP" aria-label="Up"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></button>

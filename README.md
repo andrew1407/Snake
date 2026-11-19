@@ -28,7 +28,7 @@ A classic Snake game built with **Java** and **JavaFX**. Steer the snake around 
 
 ## Showcase
 
-**[Play it in the browser](https://andrew1407.github.io/Snake/)**, with the keyboard, swipes or an on-screen pad. It keeps a best score, pauses when the tab is hidden, and copies the board as a PNG image.
+**[Play it in the browser](https://andrew1407.github.io/Snake/)**, with the keyboard, swipes or an on-screen pad. It pauses when the tab is hidden.
 
 - The game's own Java sources in [`src/sample`](src/sample) are compiled to JavaScript with [TeaVM](https://teavm.org) by the Gradle build in [`web/teavm`](web/teavm). Nothing is ported.
 - A minimal JavaFX shim in [`web/teavm/src/main/java`](web/teavm/src/main/java) stands in for the few JavaFX classes the game uses (`Application`, `Stage`, `Scene`, `Canvas`, `GraphicsContext`, `AnimationTimer`, `KeyEvent`, `Color`, `Font`), and draws on a `<canvas>` through [`web/fx.js`](web/fx.js).

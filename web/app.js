@@ -5,18 +5,9 @@ import * as fx from './fx.js';
 
 const $ = (s) => document.querySelector(s);
 const board = $('#board'), overlay = $('#overlay'), ovTitle = $('#ov-title'), ovText = $('#ov-text'), ovBtn = $('#ov-btn');
-const pauseBtn = $('#pause'), statusEl = $('#status'), errEl = $('#err');
+const statusEl = $('#status'), errEl = $('#err');
 
-let state = 'ready', score = 0, best = 0;
-const BEST_KEY = 'snake-best';
-try { best = +localStorage.getItem(BEST_KEY) || 0; } catch {}
-
-// The game's score is 10 * (FPS - 4) (FrameView.showScore), FPS starts at 4 and grows by one per pill.
-function showStats() {
-  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-  set('#s-score', score);
-  set('#s-best', best);
-}
+let state = 'ready';
 
 const VIEWS = {
   ready: { title: 'Ready', text: 'Press an arrow key or WASD, or tap Start. On a phone, swipe on the board or use the pad below.', btn: 'Start' },
@@ -36,22 +27,15 @@ function setState(s) {
     overlay.classList.toggle('low', !!v.low);
     ovTitle.hidden = !v.title;
     ovTitle.textContent = v.title || '';
-    ovText.textContent = s === 'over' ? `Final score ${score}${score && score >= best ? ', a new best' : ''}. Press Enter to play again.` : v.text;
+    ovText.textContent = v.text;
     ovBtn.textContent = v.btn;
     ovBtn.disabled = !!v.busy;
   }
-  pauseBtn.disabled = !['play', 'paused', 'hidden'].includes(s);
-  pauseBtn.textContent = s === 'paused' || s === 'hidden' ? 'Resume' : 'Pause';
   statusEl.textContent = STATUS[s];
 }
 
 fx.on((type, detail) => {
-  if (type === 'text' && detail.startsWith('Score: ')) {
-    score = parseInt(detail.slice(7), 10) || 0;
-    showStats();
-  } else if (type === 'text' && detail === 'GAME OVER' && state === 'play') {
-    if (score > best) { best = score; try { localStorage.setItem(BEST_KEY, best); } catch {} }
-    showStats();
+  if (type === 'text' && detail === 'GAME OVER' && state === 'play') {
     setState('over');
   } else if (type === 'close') {
     setState('closed');
@@ -61,7 +45,7 @@ fx.on((type, detail) => {
 async function startGame(firstKey) {
   if (state === 'loading') return;
   errEl.hidden = true;
-  score = 0; showStats();
+
   setState('loading');
   try {
     await fx.start();
@@ -152,35 +136,11 @@ document.querySelectorAll('#pad button').forEach((b) => {
 });
 
 ovBtn.addEventListener('click', () => primary());
-pauseBtn.addEventListener('click', togglePause);
-$('#restart').addEventListener('click', () => startGame());
 
 document.addEventListener('visibilitychange', () => { if (document.hidden) pauseGame('hidden'); });
-
-// Copy the board as PNG, with a download as the fallback.
-const copyBtn = $('#copy');
-const pngBlob = () => new Promise((resolve, reject) => fx.canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG encoding failed'))), 'image/png'));
-copyBtn.addEventListener('click', async () => {
-  const done = (t) => { copyBtn.textContent = t; setTimeout(() => (copyBtn.textContent = 'Copy image'), 1400); };
-  try {
-    try {
-      // pass the promise straight to ClipboardItem so Safari keeps the user gesture
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob() })]);
-      return done('Copied');
-    } catch {
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(await pngBlob());
-      a.download = `snake-score-${score}.png`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      return done('Downloaded');
-    }
-  } catch (e) { console.error(e); done('Failed'); }
-});
 
 // An empty black board until the first game starts.
 const ctx = fx.canvas.getContext('2d');
 ctx.fillStyle = '#000';
 ctx.fillRect(0, 0, fx.canvas.width, fx.canvas.height);
-showStats();
 setState('ready');
