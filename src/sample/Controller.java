@@ -36,7 +36,7 @@ public class Controller {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, k -> {
             final KeyCode kc = k.getCode();
             if (kc.equals(KeyCode.ESCAPE)) ps.close();
-            key = kc;
+            if (Keys.containsKey(kc)) key = kc;
         });
     }
 
