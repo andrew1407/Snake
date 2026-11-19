@@ -6,11 +6,11 @@
   <title>Snake</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <script src="theme.js"></script>
-  <meta name="description" content="Play the Snake game in your browser: the original Java + JavaFX source compiled to JavaScript with TeaVM, with keyboard, swipe and on-screen controls.">
+  <meta name="description" content="The Snake game in your browser.">
   <style>
     :root {
       --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6673; --line: #dfe3e8; --grid: #eceff3;
-      --accent: #3557d6; --accent-ink: #ffffff; --soft: #eef1fb; --err: #c0362c; --err-soft: #fdecea; --ok: #1f8a4c; --ok-soft: #e3f4ea;
+      --accent: #2b8a3e; --accent-ink: #ffffff; --soft: #e6f4ea; --err: #c0362c; --err-soft: #fdecea; --ok: #1f8a4c; --ok-soft: #e3f4ea;
       --c2: #d4731f;
       --java: #d4731f; --java-soft: #fbe9d9;
       --board-edge: #c9ced6;
@@ -20,7 +20,7 @@
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
         --bg: #111418; --panel: #191d23; --ink: #e6e9ee; --muted: #9aa4b2; --line: #2b313a; --grid: #222830;
-        --accent: #7c97ff; --accent-ink: #0d1117; --soft: #1f2636; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
+        --accent: #5cd07a; --accent-ink: #0d1117; --soft: #17301e; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
         --c2: #f0a050;
         --java: #f0a050; --java-soft: #3a2614;
         --board-edge: #3a414c;
@@ -29,35 +29,20 @@
     }
     :root[data-theme="dark"] {
       --bg: #111418; --panel: #191d23; --ink: #e6e9ee; --muted: #9aa4b2; --line: #2b313a; --grid: #222830;
-      --accent: #7c97ff; --accent-ink: #0d1117; --soft: #1f2636; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
+      --accent: #5cd07a; --accent-ink: #0d1117; --soft: #17301e; --err: #ff7b72; --err-soft: #3a1d1c; --ok: #4fd18b; --ok-soft: #16301f;
       --c2: #f0a050;
       --java: #f0a050; --java-soft: #3a2614;
       --board-edge: #3a414c;
       color-scheme: dark;
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
-    .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 16px 64px; }
-    header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
-    header img { flex: none; width: 52px; height: 52px; }
-    h1 { font-size: 24px; margin: 0; letter-spacing: -.01em; }
-    header p { margin: 2px 0 0; color: var(--muted); }
-    a { color: var(--accent); }
-    code { font-family: var(--mono); font-size: .92em; }
     button { font: inherit; cursor: pointer; }
     [hidden] { display: none !important; }
-
-    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 16px; }
-    h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; font-weight: 600; }
-    .lab-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
-    .lab-head h3 { margin: 0; font-size: 19px; }
-    .lab-head a { font-size: 13px; margin-left: auto; }
-    .intro { margin: 0 0 14px; color: var(--muted); max-width: 900px; }
-    .lang { font: 600 10px/1 system-ui, sans-serif; letter-spacing: .04em; padding: 3px 5px; border-radius: 5px; border: 1px solid; text-transform: uppercase; }
-    .lang.java { color: var(--java); background: var(--java-soft); border-color: var(--java); }
-
-    .game { display: grid; gap: 16px; grid-template-columns: 1fr; align-items: start; }
-    @media (min-width: 1060px) { .game { grid-template-columns: minmax(0, 750px) minmax(0, 1fr); } }
+    .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .stage { min-height: 100%; display: grid; place-content: center; padding: 16px; }
+    .game { width: min(750px, calc(100vw - 32px), calc((100svh - 100px) * 1.5)); min-width: 0; }
     .board { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--board-edge); background: #000; aspect-ratio: 3 / 2; touch-action: none; user-select: none; -webkit-user-select: none; }
     .board canvas { display: block; width: 100%; height: 100%; }
     .board:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -67,73 +52,35 @@
     .overlay small { color: #d4d8de; max-width: 420px; }
     .run { padding: 8px 20px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
     .run:disabled { opacity: .5; cursor: wait; }
-
     .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+    .bar .theme-toggle { margin-left: 0; }
     .btn { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 10px; padding: 7px 14px; font-size: 14px; }
     .btn:hover { border-color: var(--accent); }
     .btn:disabled { opacity: .5; cursor: default; border-color: var(--line); }
     .btn:focus-visible, .run:focus-visible, .pad button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-    .status { margin-left: auto; font-size: 13px; color: var(--muted); }
-    .status b { color: var(--ink); }
-    .status.over b { color: var(--err); }
-    .status.play b { color: var(--ok); }
-
-    .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
-    .stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
-    .stat span { font-size: 12px; color: var(--muted); }
-    .side h2 { margin-top: 4px; }
-    .keys { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 14px; }
-    .keys td { padding: 5px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-    .keys td:first-child { white-space: nowrap; padding-right: 12px; }
-    kbd { font: 12px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--bg); }
-    .hint { color: var(--muted); font-size: 13px; margin: 10px 0 0; }
+    .best { margin-left: auto; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .best b { color: var(--ink); }
     .err { background: var(--err-soft); border: 1px solid var(--err); border-radius: 10px; padding: 10px 14px; margin-top: 14px; color: var(--err); font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
-
     .pad { display: none; grid-template-columns: repeat(3, 64px); grid-template-rows: repeat(3, 56px); gap: 6px; justify-content: center; margin-top: 14px; touch-action: manipulation; }
     .pad button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 12px; display: grid; place-items: center; }
     .pad button:active { background: var(--soft); border-color: var(--accent); }
     .pad [data-key="UP"] { grid-area: 1 / 2; } .pad [data-key="LEFT"] { grid-area: 2 / 1; }
     .pad [data-key="RIGHT"] { grid-area: 2 / 3; } .pad [data-key="DOWN"] { grid-area: 3 / 2; }
-    @media (pointer: coarse), (max-width: 720px) { .pad { display: grid; } }
-    footer { color: var(--muted); font-size: 13px; margin-top: 24px; }
-
-    @media (max-width: 720px) {
-      .wrap { padding-top: 18px; }
-      header img { width: 42px; height: 42px; }
-      h1 { font-size: 21px; }
-      .panel { padding: 14px; border-radius: 10px; }
-      .lab-head a { margin-left: 0; flex-basis: 100%; }
+    @media (pointer: coarse), (max-width: 720px) {
+      .pad { display: grid; }
+      .bar { gap: 6px; }
+      .btn { padding: 7px 10px; }
+      .game { width: min(750px, calc(100vw - 32px)); }
       .overlay b { font-size: 17px; }
       .overlay small { font-size: 12px; }
       .overlay.low small { display: none; }
       .overlay.low { padding: 12px; }
-      .status { flex-basis: 100%; margin-left: 0; }
-      .long { display: none; }
     }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <img src="icon.svg" alt="" width="52" height="52">
-    <div>
-      <h1>Snake</h1>
-      <p>The <a href="https://github.com/Andrew1407/Snake">Snake</a> game, running in your browser. Its Java source is compiled to JavaScript with TeaVM, and a small JavaFX shim draws it on this canvas.</p>
-    </div>
-    <button class="theme-toggle" data-theme-toggle></button>
-  </header>
-
-  <main>
-    <section class="panel">
-      <div class="lab-head">
-        <h3>Snake</h3><span class="lang java">Java</span>
-        <a href="https://github.com/Andrew1407/Snake/tree/master/src/sample" target="_blank" rel="noopener">src/sample on GitHub</a>
-      </div>
-      <p class="intro">Steer the snake around the 30 × 20 grid and eat pills. Each pill makes the snake one segment longer and one move per second faster, and the score is 10 points per pill. Running into a wall or into your own body ends the game. This is the game's own code from <code>src/sample</code>, running on a minimal JavaFX shim.</p>
-
-      <div class="game">
-        <div>
+<main class="stage">
+  <div class="game">
           <div class="board" id="board" tabindex="0" aria-label="Game board. Use the arrow keys or WASD to steer, or swipe.">
             <canvas id="game" width="750" height="500"></canvas>
             <div class="overlay" id="overlay">
@@ -142,47 +89,23 @@
               <button type="button" class="run" id="ov-btn">Start</button>
             </div>
           </div>
+          <div class="bar">
+            <button type="button" class="btn" id="pause" disabled>Pause</button>
+            <button type="button" class="btn" id="restart">Restart</button>
+            <button type="button" class="btn" id="copy" title="Copy the board as a PNG image">Copy image</button>
+            <span class="best">Best <b id="s-best">0</b></span>
+            <button class="theme-toggle" data-theme-toggle></button>
+            <span class="sr" id="status" role="status" aria-live="polite"></span>
+          </div>
           <div class="pad" id="pad" aria-label="Direction pad">
             <button type="button" data-key="UP" aria-label="Up"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 15l7-7 7 7"/></svg></button>
             <button type="button" data-key="LEFT" aria-label="Left"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
             <button type="button" data-key="RIGHT" aria-label="Right"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
             <button type="button" data-key="DOWN" aria-label="Down"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
           </div>
-          <div class="bar">
-            <button type="button" class="btn" id="pause" disabled>Pause</button>
-            <button type="button" class="btn" id="restart">Restart</button>
-            <button type="button" class="btn" id="copy" title="Copy the board as a PNG image (downloads it if the clipboard is unavailable)">Copy image</button>
-            <span class="status" id="status" role="status" aria-live="polite">Status: <b>Ready</b></span>
-          </div>
           <div class="err" id="err" hidden></div>
-        </div>
-
-        <aside class="side">
-          <div class="stats">
-            <div class="stat"><b id="s-score">0</b><span>Score</span></div>
-            <div class="stat"><b id="s-speed">4</b><span>Speed, moves per second</span></div>
-            <div class="stat"><b id="s-length">1</b><span>Snake length</span></div>
-            <div class="stat"><b id="s-best">0</b><span>Best score <span class="long">on this device</span></span></div>
-          </div>
-          <h2>Controls</h2>
-          <table class="keys">
-            <tr><td><kbd>W</kbd> <kbd>↑</kbd></td><td>Move up</td></tr>
-            <tr><td><kbd>S</kbd> <kbd>↓</kbd></td><td>Move down</td></tr>
-            <tr><td><kbd>A</kbd> <kbd>←</kbd></td><td>Move left</td></tr>
-            <tr><td><kbd>D</kbd> <kbd>→</kbd></td><td>Move right</td></tr>
-            <tr><td>Swipe, pad</td><td>Steer on a touch screen</td></tr>
-            <tr><td><kbd>Space</kbd> <kbd>P</kbd></td><td>Pause or resume (the page also pauses when you switch tabs)</td></tr>
-            <tr><td><kbd>Enter</kbd></td><td>Start, resume or play again</td></tr>
-            <tr><td><kbd>Esc</kbd></td><td>Quit, as in the desktop game, which closes its window</td></tr>
-          </table>
-          <p class="hint">The snake starts at a random cell heading up. A reversed direction runs the head into the body, as in the original. The score, speed and length come from the game's own <code>Score:</code> text on the board.</p>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <footer>The game's timer is JavaFX's <code>AnimationTimer</code>, here driven by <code>requestAnimationFrame</code>, so the top speed is one move per display frame, as on the desktop.</footer>
-</div>
+  </div>
+</main>
 
 <script type="module" src="./app.js"></script>
 </body>

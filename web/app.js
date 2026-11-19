@@ -13,10 +13,9 @@ try { best = +localStorage.getItem(BEST_KEY) || 0; } catch {}
 
 // The game's score is 10 * (FPS - 4) (FrameView.showScore), FPS starts at 4 and grows by one per pill.
 function showStats() {
-  $('#s-score').textContent = score;
-  $('#s-speed').textContent = score / 10 + 4;
-  $('#s-length').textContent = score / 10 + 1;
-  $('#s-best').textContent = best;
+  const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+  set('#s-score', score);
+  set('#s-best', best);
 }
 
 const VIEWS = {
@@ -43,8 +42,7 @@ function setState(s) {
   }
   pauseBtn.disabled = !['play', 'paused', 'hidden'].includes(s);
   pauseBtn.textContent = s === 'paused' || s === 'hidden' ? 'Resume' : 'Pause';
-  statusEl.className = `status ${s === 'play' ? 'play' : s === 'over' ? 'over' : ''}`;
-  statusEl.innerHTML = `Status: <b>${STATUS[s]}</b>`;
+  statusEl.textContent = STATUS[s];
 }
 
 fx.on((type, detail) => {
