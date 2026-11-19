@@ -8,12 +8,12 @@
   <meta name="description" content="The Snake game in your browser.">
   <style>
     * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background: #000; color: #fff; overflow: hidden; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    html, body { height: 100%; margin: 0; background: #23272e; color: #fff; overflow: hidden; font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
     button { font: inherit; cursor: pointer; }
     [hidden] { display: none !important; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-    /* the whole window is the game, like the desktop window; the 30 x 20 board is scaled to fit */
-    .board { position: fixed; inset: 0; background: #000; touch-action: none; user-select: none; -webkit-user-select: none; outline: none; }
+    /* the 30 x 20 board (black, as the game draws it) is scaled to fit; the grey around it marks the walls, like the desktop window edges */
+    .board { position: fixed; inset: 0; background: transparent; touch-action: none; user-select: none; -webkit-user-select: none; outline: none; }
     .board canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
     .overlay { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; text-align: center; padding: 16px; background: rgb(0 0 0 / .55); }
     .overlay.low { inset: auto 0 0 0; background: linear-gradient(transparent, rgb(0 0 0 / .65)); padding: 28px 16px 24px; }
