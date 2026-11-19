@@ -21,8 +21,8 @@ public class Pill {
 
     final public void Spawn(final SnakeBody Snake)
     {
-        boolean go_to_start = false;
         while (true) {
+            boolean go_to_start = false;
             x = rand.nextInt(SQUARE_WIDTH);
             y = rand.nextInt(SQUARE_HEIGHT);
 
